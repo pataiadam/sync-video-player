@@ -8,7 +8,7 @@ class MultiVideoPlayer {
   constructor(options: MultiVideoPlayerOptions) {
     this.options = {
       controls: options.controls ?? true,
-      area: options.area,
+      area: options.area || '',
       videos: options.videos || [],
       template: '<div id="multi_video_player_container"></div>'
     };
@@ -16,11 +16,9 @@ class MultiVideoPlayer {
     this.$container = null;
 
     this.videoPlayers = [];
-
-    this.mount();
   }
 
-  private mount() {
+  public mount() {
     this.render();
     this.addVideos(this.options.videos);
   }
@@ -28,7 +26,7 @@ class MultiVideoPlayer {
   private render() {
     const { template, area } = this.options;
     if (!area) {
-      return console.error('area is required in options');
+      return;
     }
     const areaEl = document.querySelector(area);
     if (!areaEl) {
@@ -51,6 +49,18 @@ class MultiVideoPlayer {
     // TODO: check video is valid
     const videoInstance = new VideoPlayer(this, video);
     this.videoPlayers.push(videoInstance);
+  }
+
+  public async play() {
+    await Promise.all(this.videoPlayers.map(async video => {
+      await video.play();
+    }));
+  }
+
+  public async pause() {
+    await Promise.all(this.videoPlayers.map(async video => {
+      await video.pause();
+    }));
   }
 }
 

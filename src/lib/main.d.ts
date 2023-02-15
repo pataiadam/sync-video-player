@@ -3,6 +3,7 @@ type MultiVideoPlayer = {
   options: MultiVideoPlayerOptions,
   $container: Element | null,
   videoPlayers: Array<VideoPlayer>,
+  mount(): void,
   addVideos(videos: Array<VideoPlayerOptions> | undefined): void,
   addVideo(video: VideoPlayerOptions): void,
 }
@@ -15,7 +16,9 @@ type VideoPlayerOptions = {
 
 type MultiVideoPlayerOptions = {
   videos?: Array<VideoOptions>,
-  area: string
+  area?: string
   template?: string,
   controls?: boolean,
 }
+
+type PlayerState = number;

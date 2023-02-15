@@ -1,0 +1,9 @@
+
+export enum PlayerState {
+  UNSTARTED = 'UNSARTED',
+  ENDED = 'ENDED',
+  PLAYING = 'PLAYING',
+  PAUSE = 'PAUSE',
+  BUFFERING = 'BUFFERING',
+  LOADING = 'LOADING',
+}
