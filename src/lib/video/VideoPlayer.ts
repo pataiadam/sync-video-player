@@ -1,8 +1,8 @@
 class VideoPlayer {
-    public video: string;
+    public video: VideoOptions;
     private player: MultiVideoPlayer;
     private videoId: string;
-    constructor(player: MultiVideoPlayer, video: string, options?: VideoPlayerOptions) {
+    constructor(player: MultiVideoPlayer, video: VideoOptions, options?: VideoPlayerOptions) {
         this.player = player;
         this.video = video;
         this.videoId = options?.videoId || '';

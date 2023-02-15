@@ -3,7 +3,7 @@ import VideoPlayer from './video/VideoPlayer';
 class MultiVideoPlayer {
     public options: MultiVideoPlayerOptions;
     public $container: Element | null;
-    public videos: Array<VideoPlayer> = [];
+    public videoPlayers: Array<VideoPlayer> = [];
 
     constructor(options: MultiVideoPlayerOptions) {
         this.options = {
@@ -14,14 +14,14 @@ class MultiVideoPlayer {
 
         this.$container = null;
 
-        this.videos = [];
+        this.videoPlayers = [];
 
         this.mount();
     }
 
     private mount() {
         this.render();
-        this.addVideos(this.options.videos!);
+        this.addVideos(this.options.videos);
     }
 
     private render() {
@@ -33,20 +33,23 @@ class MultiVideoPlayer {
         if (!areaEl) {
             return console.error('area not found: ', area);
         }
-        areaEl.innerHTML = template!;
+
+        areaEl.innerHTML = template || '';
         this.$container = document.querySelector('#multi_video_player_container');
     }
 
-    public addVideos(videos: Array<string>) {
+    public addVideos(videos: Array<VideoOptions> | undefined) {
+        if (!videos) return;
+
         videos.forEach(video => {
             this.addVideo(video);
         });
     }
 
-    public addVideo(video: string) {
-    // TODO: check video is valid
+    public addVideo(video: VideoOptions) {
+        // TODO: check video is valid
         const videoInstance = new VideoPlayer(this, video);
-        this.videos.push(videoInstance);
+        this.videoPlayers.push(videoInstance);
     }
 }
 

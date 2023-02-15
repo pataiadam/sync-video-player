@@ -2,13 +2,17 @@
 type MultiVideoPlayer = {
   options: MultiVideoPlayerOptions,
   $container: Element | null,
-  videos: Array<VideoPlayer>,
-  addVideos: (videos: Array<string>) => void,
-  addVideo: (video: string) => void,
+  videoPlayers: Array<VideoPlayer>,
+  addVideos(videos: Array<VideoOptions> | undefined): void,
+  addVideo(video: VideoOptions): void,
+}
+
+type VideoOptions = {
+  src: string,
 }
 
 type MultiVideoPlayerOptions = {
-  videos?: Array<string>,
+  videos?: Array<VideoOptions>,
   area: string
   template?: string,
 }

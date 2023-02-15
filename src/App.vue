@@ -20,19 +20,15 @@ onMounted(() => {
         videos: [
             {
                 src: 'https://static.videezy.com/system/resources/previews/000/050/817/original/002822-HD-SPECTRUM-COUNTDOWN-01.mp4',
-                title: 'Video 1'
             },
             {
                 src: 'https://static.videezy.com/system/resources/previews/000/051/313/original/002823-HD-SPECTRUM-COUNTDOWN-02.mp4',
-                title: 'Video 2'
             },
             {
                 src: 'https://static.videezy.com/system/resources/previews/000/049/943/original/002831-HD-COUNTDOWN-03.mp4',
-                title: 'Video 3'
             },
             {
                 src: 'https://static.videezy.com/system/resources/previews/000/004/294/original/18_20Dragon_20Coaster_20Part_202.mp4',
-                title: 'Video 4'
             },
         ],
         area: '#multi-video-player',
