@@ -1,0 +1,25 @@
+{
+  "name": "multi-video-player",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.45"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
+    "@typescript-eslint/parser": "^5.52.0",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "eslint": "^8.34.0",
+    "eslint-plugin-vue": "^9.9.0",
+    "typescript": "^4.9.3",
+    "vite": "^4.1.0",
+    "vue-eslint-parser": "^9.1.0",
+    "vue-tsc": "^1.0.24"
+  }
+}
