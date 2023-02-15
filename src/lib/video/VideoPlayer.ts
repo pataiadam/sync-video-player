@@ -45,8 +45,6 @@ class VideoPlayer {
   }
 
   private render() {
-    // style width: fit-content;
-    //     height: inherit;
     const videoHTML = `
         <video 
             id="video_player_${this.videoId}"
