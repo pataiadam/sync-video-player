@@ -1,28 +1,31 @@
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import {onMounted, nextTick, ref} from 'vue';
 
 import MultiVideoPlayer from './lib';
+
+const ids = ref( ['video-0', 'video-1', 'video-2']);
 
 const multiVideoPlayer = new MultiVideoPlayer({
   //area: '#multi-video-player',
   controls: false,
-  videos: [
+  videoPlayers: [
     {
-      src: 'https://static.videezy.com/system/resources/previews/000/050/817/original/002822-HD-SPECTRUM-COUNTDOWN-01.mp4',
-      area: '#video-one',
+      id: '#video-0',
+      controls: true,
+      initialSrc: 'https://static.videezy.com/system/resources/previews/000/050/817/original/002822-HD-SPECTRUM-COUNTDOWN-01.mp4',
     },
     {
-      src: 'https://static.videezy.com/system/resources/previews/000/051/313/original/002823-HD-SPECTRUM-COUNTDOWN-02.mp4',
-      area: '#video-two',
+      id: '#video-1',
+      initialSrc: 'https://static.videezy.com/system/resources/previews/000/051/313/original/002823-HD-SPECTRUM-COUNTDOWN-02.mp4',
     },
     {
-      src: 'https://static.videezy.com/system/resources/previews/000/049/943/original/002831-HD-COUNTDOWN-03.mp4',
-      area: '#video-three',
+      id: '#video-2',
+      initialSrc: 'https://static.videezy.com/system/resources/previews/000/049/943/original/002831-HD-COUNTDOWN-03.mp4',
     },
     {
-      src: 'https://static.videezy.com/system/resources/previews/000/004/294/original/18_20Dragon_20Coaster_20Part_202.mp4',
-      area: '#video-four',
+      id: '#video-3',
+      initialSrc: 'https://static.videezy.com/system/resources/previews/000/004/294/original/18_20Dragon_20Coaster_20Part_202.mp4',
     },
   ],
 });
@@ -38,21 +41,38 @@ async function onPlay() {
 async function onPause() {
   await multiVideoPlayer.pause();
 }
+
+function onAdd() {
+  // create area for video1
+  const id = `video-${Math.random().toString(36).substring(2, 9)}`;
+  ids.value.push(id);
+  nextTick(() => {
+    // add video
+    multiVideoPlayer.addVideoPlayer({
+      id: `#${id}`,
+      initialSrc: 'https://static.videezy.com/system/resources/previews/000/004/294/original/18_20Dragon_20Coaster_20Part_202.mp4',
+    });
+  });
+}
+
+async function onClick(index: number) {
+  console.log('onClick', index);
+  multiVideoPlayer.swapVideo(0, index);
+}
 </script>
 
 <template>
   <div>
-
-    <div class="video-container">
-      <div id="video-one" class="video video-big">Big Video</div>
-      <div class="small-videos">
-        <div id="video-two" class="video video-small">Small Video</div>
-        <div id="video-three" class="video video-small">Small Video</div>
-        <div id="video-four" class="video video-small">Small Video</div>
-      </div>
+    <div class="container">
+      <div v-for="(id, i) in ids"
+           class="box"
+           :id="id"
+            :key="i"
+           @click="onClick(i)">B</div>
     </div>
 
     <div class="controls">
+      <button @click="onAdd" >Add video</button>
       <button @click="onPlay" >Play</button>
       <button @click="onPause">Pause</button>
     </div>
@@ -60,31 +80,43 @@ async function onPause() {
 </template>
 
 
-<style scoped>
-.video-container {
-  display: flex;
-  flex-direction: row;
-}
+<style scoped lang="scss">
 
-.video {
-  margin: 10px;
-  display: flex;
-  font-size: 24px;
+ .container {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   grid-column-gap: 16px;
+   grid-row-gap: 16px;
+ }
+
+.box {
+  min-width: 180px;
+  height: 200px;
+  padding: 8px;
   font-weight: bold;
-}
-
-.video-big {
-  flex: 0 0 80%;
-}
-
-.small-videos {
+  font-size: 17px;
+  line-height: 24px;
+  border: 1px solid #589BFF;
+  border-radius: 12px;
   display: flex;
-  flex-direction: column;
-  flex: 0 0 20%;
+  align-items: center;
+  box-sizing: border-box;
 }
 
-.video-small {
-  height: 100px;
-  margin: 10px 0;
-}
+.qqq {
+  grid-area: aaa;
+};
+
+.www {
+  grid-area: bbb;
+};
+
+.eee {
+  grid-area: ccc;
+};
+
+.rrr {
+  grid-area: ddd;
+};
+
 </style>

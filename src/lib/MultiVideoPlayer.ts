@@ -10,6 +10,7 @@ class MultiVideoPlayer {
       controls: options.controls ?? true,
       area: options.area || '',
       videos: options.videos || [],
+      videoPlayers: options.videoPlayers || [],
       template: '<div id="multi_video_player_container"></div>'
     };
 
@@ -20,7 +21,8 @@ class MultiVideoPlayer {
 
   public mount() {
     this.render();
-    this.addVideos(this.options.videos);
+    // this.addVideos(this.options.videos);
+    this.addVideoPlayers(this.options.videoPlayers);
   }
 
   private render() {
@@ -37,17 +39,17 @@ class MultiVideoPlayer {
     this.$container = document.querySelector('#multi_video_player_container');
   }
 
-  public addVideos(videos: Array<VideoPlayerOptions> | undefined) {
-    if (!videos) return;
+  public addVideoPlayers(videoPlayers: Array<VideoPlayerOptions> | undefined) {
+    if (!videoPlayers) return;
 
-    videos.forEach(video => {
-      this.addVideo(video);
+    videoPlayers.forEach(videoPlayer => {
+      this.addVideoPlayer(videoPlayer);
     });
   }
 
-  public addVideo(video: VideoPlayerOptions) {
-    // TODO: check video is valid
-    const videoInstance = new VideoPlayer(this, video);
+  public addVideoPlayer(videoPlayer: VideoPlayerOptions) {
+    const videoInstance = new VideoPlayer(this, videoPlayer);
+    if (!videoInstance.videoElement) return;
     this.videoPlayers.push(videoInstance);
   }
 
@@ -61,6 +63,15 @@ class MultiVideoPlayer {
     await Promise.all(this.videoPlayers.map(async video => {
       await video.pause();
     }));
+  }
+
+  public swapVideo(index1: number, index2: number) {
+    if (index1 === index2) return;
+    console.log(this.videoPlayers);
+    this.videoPlayers[index1]._swap(this.videoPlayers[index2]);
+    const tmp = this.videoPlayers[index1];
+    this.videoPlayers[index1] = this.videoPlayers[index2];
+    this.videoPlayers[index2] = tmp;
   }
 }
 
