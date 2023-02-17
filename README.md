@@ -22,8 +22,8 @@ npm install sync-video-player
 
 Once installed, you can use SyncVideoPlayer in your project like this:
 
-```
-const multiVideoPlayer = new SyncVideoPlayer({
+```jsx
+const syncVideoPlayer = new SyncVideoPlayer({
   controls: false,
   loop: true,
   videoPlayers: [
@@ -45,13 +45,41 @@ const multiVideoPlayer = new SyncVideoPlayer({
   ],
 });
 
+//    Once you're ready, just mount it using 
+syncVideoPlayer.mount() 
+//    to start playing the videos.
 ```
 
 ## 🧩 Parameters
 
 SyncVideoPlayer exposes the following parameters to customize the video player:
 
+| Name | Description |
+| --- | --- |
+| controls | Whether or not to show video controls |
+| loop | Whether or not to loop the video |
+| videoPlayers | An array of video players, each with an id, startSeconds, controls, main, and initialSrc |
+
 Parameters for objects of `videoPlayers`:
+
+| Parameter | Description |
+| --- | --- |
+| videoPlayers.id | The id of the HTML element to render the video player |
+| videoPlayers.startSeconds | The starting position in the video (in seconds) |
+| videoPlayers.initialSrc | The initial source of the video |
+| videoPlayers.main |  specify which video should be the main video (all other videos will sync to it) |
+| videoPlayers.controls | Whether or not to show the video controls. Default true. This will override the global settings |
+
+## 🔧 Available Methods
+
+SyncVideoPlayer provides the following methods to control the player:
+
+- `mount()`: Mounts the video player and starts playing the videos.
+- `addVideoPlayers(videoPlayers)`: Adds multiple video players to the player.
+- `addVideoPlayer(videoPlayer)`: Adds a single video player to the player.
+- `timeTo(seconds)`: Sets the time of all players to the given seconds.
+- `play()`: Starts playing the videos.
+- `pause()`: Pauses the videos.
 
 ## 🔥 Contributing
 
