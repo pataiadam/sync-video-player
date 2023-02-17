@@ -1,6 +1,5 @@
 {
   "name": "sync-video-player",
-  "private": true,
   "version": "1.0.0",
   "type": "module",
   "description": "\uD83D\uDD25 SyncVideoPlayer is an npm package that can play multiple HTML videos at once and keep them in sync.",
