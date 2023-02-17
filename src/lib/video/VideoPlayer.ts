@@ -1,10 +1,14 @@
 import {PlayerState} from '../constants';
+import {MultiVideoPlayer, VideoPlayerOptions} from '../main';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = () => { };
 class VideoPlayer {
   public videoId: string;
   public videoPlayerConfig: VideoPlayerOptions;
   private player: MultiVideoPlayer;
   public controls: boolean;
+  public main: boolean;
   public videoPlayerArea: Element | null;
   public videoElement: HTMLVideoElement | null;
   public videoState: PlayerState;
@@ -14,6 +18,7 @@ class VideoPlayer {
     this.videoId = Math.random().toString(36).substring(2, 15);
     this.player = player;
     this.videoPlayerConfig = videoPlayerConfig;
+    this.main = this.videoPlayerConfig.main ?? false;
     this.controls = this.videoPlayerConfig.controls ?? player.options.controls ?? true;
     this.loop = player.options.loop ?? false;
 
@@ -34,7 +39,7 @@ class VideoPlayer {
       return console.debug('video element not found');
     }
 
-    this.setupVideoElement({ controls: this.controls });
+    this.setupVideoElement({ controls: this.controls, main: this.main });
 
     this.videoElement.addEventListener('loadeddata', this.onReady.bind(this), false);
     this.videoElement.addEventListener('canplaythrough', this.onStateChange.bind(this, PlayerState.UNSTARTED), false);
@@ -50,13 +55,21 @@ class VideoPlayer {
   private onReady() {
     console.log(this.videoId, '::[onReady]');
     this.timeTo(0);
+    this.player.onReady();
   }
 
   private onSeeking() {
+    console.log(this.videoId, '::[onSeeking]');
+    if (!this.main) {
+      return;
+    }
     this.player.onTimeUpdate(this, this.getPlayedTime());
   }
 
   private onTimeUpdate() {
+    if (!this.main) {
+      return;
+    }
     this.player.onTimeUpdate(this, this.getPlayedTime());
   }
 
@@ -68,14 +81,12 @@ class VideoPlayer {
       PlayerState.BUFFERING,
       PlayerState.PLAYING,
       PlayerState.PAUSE,
+      PlayerState.ENDED,
+      PlayerState.UNSTARTED,
     ];
 
     if (statesToPropagate.includes(state)) {
-      this.player.changeState(state);
-    }
-
-    if (state === PlayerState.ENDED && this.loop) {
-      this.player.timeTo(0);
+      this.player.changeState(state, this);
     }
   }
 
@@ -95,8 +106,9 @@ class VideoPlayer {
     `;
   }
 
-  private setupVideoElement(options: { controls: boolean }) {
+  private setupVideoElement(options: { controls: boolean, main: boolean }) {
     this.setControls(options.controls);
+    this.setMain(options.main);
   }
 
   public _swap(videoPlayer: VideoPlayer) {
@@ -113,8 +125,9 @@ class VideoPlayer {
     parentA.insertBefore(nodeB, siblingA);
 
     const thisControls = this.controls;
-    this.setupVideoElement({ controls: videoPlayer.controls });
-    videoPlayer.setupVideoElement({ controls: thisControls });
+    const thisMain = this.main;
+    this.setupVideoElement({ controls: videoPlayer.controls, main: videoPlayer.main });
+    videoPlayer.setupVideoElement({ controls: thisControls, main: thisMain });
   }
 
   /**
@@ -125,7 +138,7 @@ class VideoPlayer {
 
   public async play() {
     if (!this.videoElement) return;
-    await this.videoElement.play();
+    await this.videoElement.play().catch(noop);
   }
 
   public async pause() {
@@ -136,7 +149,7 @@ class VideoPlayer {
   public stop() {
     if (!this.videoElement) return;
     this.videoElement.pause();
-    this.timeTo(0);
+    this.timeTo(this.getDuration() - 0.5);
   }
 
   public setControls(controls: boolean) {
@@ -145,16 +158,21 @@ class VideoPlayer {
     this.controls = controls;
   }
 
-  public timeTo(time: number) {
+  public setMain(main: boolean) {
+    this.main = main;
+  }
+
+  public timeTo(time: number, startPlay = false) {
     if (!this.videoElement) return;
     time = parseFloat(time.toString());
     time = (time + this._startSeconds);
 
     if (time >= this.getDuration()) {
-      this.stop();
+      // this.videoElement.currentTime = this.getDuration() - 0.5;
       return console.debug('timeTo: time is greater than duration');
     }
 
+    console.log('set time to: ', time);
     this.videoElement.currentTime = time;
   }
 
@@ -162,8 +180,12 @@ class VideoPlayer {
     return (this.videoElement?.duration || 0);
   }
 
+  public getCurrentTime() {
+    return (this.videoElement?.currentTime || 0);
+  }
+
   public getPlayedTime() {
-    const time = (this.videoElement?.currentTime || 0) - this._startSeconds;
+    const time = this.getCurrentTime() - this._startSeconds;
     return Math.max(time, 0);
   }
 }

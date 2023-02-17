@@ -6,4 +6,5 @@ export enum PlayerState {
   PAUSE = 'PAUSE',
   BUFFERING = 'BUFFERING',
   LOADING = 'LOADING',
+  LOADED = 'LOADED',
 }

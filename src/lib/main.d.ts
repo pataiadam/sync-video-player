@@ -1,4 +1,6 @@
 // define type for MultiVideoPlayer class
+import VideoPlayer from "./video/VideoPlayer";
+
 type MultiVideoPlayer = {
   options: MultiVideoPlayerOptions,
   $container: Element | null,
@@ -6,9 +8,11 @@ type MultiVideoPlayer = {
   mount(): void,
   addVideoPlayers(videos: Array<VideoPlayerOptions> | undefined): void,
   addVideoPlayer(video: VideoPlayerOptions): void,
-  changeState(state: PlayerState): void;
+  changeState(state: PlayerState, videoPlayer?: VideoPlayer): void;
   timeTo(seconds: number): void;
   onTimeUpdate(videoPlayer: VideoPlayer, time: number): void;
+  play(): Promise<void>;
+  onReady(): void;
 }
 
 type VideoPlayerOptions = {
@@ -16,6 +20,7 @@ type VideoPlayerOptions = {
   controls?: boolean,
   initialSrc: string,
   startSeconds?: number,
+  main?: boolean,
 }
 
 type MultiVideoPlayerOptions = {

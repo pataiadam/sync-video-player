@@ -1,5 +1,27 @@
 import {PlayerState} from './constants';
+import {MultiVideoPlayerOptions, VideoPlayerOptions} from './main';
 import VideoPlayer from './video/VideoPlayer';
+
+const validStates = {
+  [PlayerState.LOADING]: [PlayerState.LOADED],
+  [PlayerState.LOADED]: [PlayerState.PLAYING],
+  [PlayerState.PLAYING]: [PlayerState.PAUSE, PlayerState.ENDED],
+  [PlayerState.PAUSE]: [PlayerState.PLAYING, PlayerState.ENDED],
+  [PlayerState.ENDED]: [PlayerState.PLAYING],
+
+  [PlayerState.BUFFERING]: [],
+  [PlayerState.UNSTARTED]: [],
+};
+
+const isValidState = (currentState: PlayerState, nextState: PlayerState) => {
+  const stateOuts: Array<PlayerState> = validStates[currentState];
+  if (!stateOuts) {
+    return false;
+  }
+
+  return stateOuts.includes(nextState);
+};
+
 
 class MultiVideoPlayer {
   public options: MultiVideoPlayerOptions;
@@ -14,7 +36,6 @@ class MultiVideoPlayer {
       controls: options.controls ?? true,
       loop: options.loop ?? false,
       area: options.area || '',
-      videos: options.videos || [],
       videoPlayers: options.videoPlayers || [],
       template: '<div id="multi_video_player_container"></div>'
     };
@@ -30,7 +51,6 @@ class MultiVideoPlayer {
 
   public mount() {
     this.render();
-    // this.addVideos(this.options.videos);
     this.addVideoPlayers(this.options.videoPlayers);
   }
 
@@ -48,7 +68,7 @@ class MultiVideoPlayer {
     this.$container = document.querySelector('#multi_video_player_container');
   }
 
-  public changeState(state: PlayerState) {
+  public async changeState(state: PlayerState, videoPlayer: VideoPlayer) {
     if (state === PlayerState.BUFFERING) {
       // TODO: find out how to handle buffering
       return;
@@ -57,22 +77,61 @@ class MultiVideoPlayer {
       return this.play();
     }
     if (state === PlayerState.PAUSE) {
+      const diff = Math.abs(videoPlayer.getCurrentTime() - videoPlayer.getDuration());
+      if (diff < 0.1) {
+        return;
+      }
       return this.pause();
+    }
+    if (state === PlayerState.ENDED) {
+      // the main video player is the only one that can end if main is set
+      const mainVideoPlayer = this.videoPlayers.find((vp) => {
+        return vp.main;
+      });
+      if (mainVideoPlayer && mainVideoPlayer !== videoPlayer) {
+        return;
+      }
+
+      await this.moveStateTo(PlayerState.ENDED, () => {
+        if (this.options.loop) {
+          this.timeTo(0);
+        }
+      });
+    }
+    if (state === PlayerState.UNSTARTED) {
+      if (this.state === PlayerState.ENDED) {
+        if (this.options.loop) {
+          await this.play();
+        }
+      }
     }
   }
 
-  public onReady() {
+  private async moveStateTo(state: PlayerState, success?: (newState: PlayerState, oldState: PlayerState) => void, fail?: (newState: PlayerState, oldState: PlayerState) => void) {
+    if (isValidState(this.state, state)) {
+      const oldState = this.state;
+      this.state = state;
+      if (success) {
+        await success(this.state, oldState);
+      }
+      console.log('state changed to: ', state);
+    } else {
+      if (fail) {
+        await fail(this.state, state);
+      }
+      console.error('invalid state change: ', this.state, state);
+    }
+  }
+
+  public async onReady() {
     this.readyCount++;
     if (this.readyCount !== this.videoPlayers.length) return;
-    this.state = PlayerState.UNSTARTED;
+    await this.moveStateTo(PlayerState.LOADED);
   }
 
   public onTimeUpdate(videoPlayer: VideoPlayer, time: number) {
-    // console.log(videoPlayer.videoId, time);
-    // diff
     const diff = Math.abs(this.currentTime - time);
     if (diff > 0.5) {
-      console.log('diff', diff);
       this.timeTo(time);
     }
     this.currentTime = time;
@@ -98,34 +157,39 @@ class MultiVideoPlayer {
   }
 
   public async play() {
-    this.timeTo(this.currentTime);
-    await Promise.all(this.videoPlayers.map(async video => {
-      await video.play();
-    }));
+    await this.moveStateTo(PlayerState.PLAYING, async () => {
+      this.timeTo(this.currentTime);
+      await Promise.all(this.videoPlayers.map(async video => {
+        await video.play();
+      }));
+    });
   }
 
   public async pause() {
-    await Promise.all(this.videoPlayers.map(async video => {
-      await video.pause();
-    }));
+    await this.moveStateTo(PlayerState.PAUSE, async () => {
+      await Promise.all(this.videoPlayers.map(async video => {
+        await video.pause();
+      }));
+    });
   }
 
   public async stop() {
-    await Promise.all(this.videoPlayers.map(async video => {
-      await video.stop();
-    }));
+    await this.moveStateTo(PlayerState.PAUSE, async () => {
+      await Promise.all(this.videoPlayers.map(async video => {
+        await video.stop();
+      }));
+    });
   }
 
   public timeTo(time: number) {
     this.currentTime = time;
     this.videoPlayers.forEach(video => {
-      video.timeTo(time);
+      video.timeTo(time, this.state === PlayerState.PLAYING);
     });
   }
 
   public swapVideo(index1: number, index2: number) {
     if (index1 === index2) return;
-    console.log(this.videoPlayers);
     this.videoPlayers[index1]._swap(this.videoPlayers[index2]);
     const tmp = this.videoPlayers[index1];
     this.videoPlayers[index1] = this.videoPlayers[index2];

@@ -14,6 +14,7 @@ const multiVideoPlayer = new MultiVideoPlayer({
     {
       id: '#video-0',
       controls: true,
+      main: true,
       initialSrc: 'https://static.videezy.com/system/resources/previews/000/050/817/original/002822-HD-SPECTRUM-COUNTDOWN-01.mp4',
     },
     {
