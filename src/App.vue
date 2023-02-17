@@ -61,9 +61,9 @@ async function onClick(index: number) {
   syncVideoPlayer.swapVideo(0, index);
 }
 
-async function onChange(e) {
-  const value = e.target.value;
-  await syncVideoPlayer.timeTo(value);
+async function onChange(e: Event) {
+  const value = (<HTMLInputElement>e.target).value;
+  await syncVideoPlayer.timeTo(parseFloat(value));
 }
 </script>
 

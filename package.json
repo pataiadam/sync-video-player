@@ -3,6 +3,19 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "\uD83D\uDD25 SyncVideoPlayer is an npm package that can play multiple HTML videos at once and keep them in sync.",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/sync-video-player.umd.js",
+  "module": "./dist/sync-video-player.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/sync-video-player.es.js",
+      "require": "./dist/sync-video-player.umd.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
