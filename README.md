@@ -90,3 +90,7 @@ We welcome contributions to the SyncVideoPlayer project! If you'd like to help o
 We'd like to thank all of our contributors for their hard work and dedication to this project. Your help has made SyncVideoPlayer a success and we appreciate it!
 
 We'd also like to thank the [SplitPlayer](https://github.com/fluse/SplitPlayer) project for providing inspiration for this project.
+
+## 📄 License
+
+SyncVideoPlayer is released under the [MIT License](https://github.com/pataiadam/sync-video-player/blob/main/LICENSE).
