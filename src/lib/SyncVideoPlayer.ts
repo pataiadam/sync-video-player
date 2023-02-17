@@ -24,7 +24,7 @@ const isValidState = (currentState: PlayerState, nextState: PlayerState) => {
 };
 
 
-class MultiVideoPlayer {
+class SyncVideoPlayer {
   public options: MultiVideoPlayerOptions;
   public $container: Element | null;
   public videoPlayers: Array<VideoPlayer> = [];
@@ -38,7 +38,7 @@ class MultiVideoPlayer {
       loop: options.loop ?? false,
       area: options.area || '',
       videoPlayers: options.videoPlayers || [],
-      template: '<div id="multi_video_player_container"></div>'
+      template: '<div id="sync_video_player_container"></div>'
     };
 
     this.state = PlayerState.LOADING;
@@ -66,7 +66,7 @@ class MultiVideoPlayer {
     }
 
     areaEl.innerHTML = template || '';
-    this.$container = document.querySelector('#multi_video_player_container');
+    this.$container = document.querySelector('#sync_video_player_container');
   }
 
   public async changeState(state: PlayerState, videoPlayer: VideoPlayer) {
@@ -222,4 +222,4 @@ class MultiVideoPlayer {
   }
 }
 
-export default MultiVideoPlayer;
+export default SyncVideoPlayer;

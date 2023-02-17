@@ -2,12 +2,11 @@
 <script setup lang="ts">
 import {onMounted, nextTick, ref} from 'vue';
 
-import MultiVideoPlayer from './lib';
+import SyncVideoPlayer from './lib';
 
 const ids = ref( ['video-0', 'video-1', 'video-2']);
 
-const multiVideoPlayer = new MultiVideoPlayer({
-  //area: '#multi-video-player',
+const syncVideoPlayer = new SyncVideoPlayer({
   controls: false,
   loop: true,
   videoPlayers: [
@@ -34,15 +33,15 @@ const multiVideoPlayer = new MultiVideoPlayer({
 });
 
 onMounted(() => {
-  multiVideoPlayer.mount();
+  syncVideoPlayer.mount();
 });
 
 async function onPlay() {
-  await multiVideoPlayer.play();
+  await syncVideoPlayer.play();
 }
 
 async function onPause() {
-  await multiVideoPlayer.pause();
+  await syncVideoPlayer.pause();
 }
 
 function onAdd() {
@@ -51,7 +50,7 @@ function onAdd() {
   ids.value.push(id);
   nextTick(() => {
     // add video
-    multiVideoPlayer.addVideoPlayer({
+    syncVideoPlayer.addVideoPlayer({
       id: `#${id}`,
       initialSrc: 'https://static.videezy.com/system/resources/previews/000/004/294/original/18_20Dragon_20Coaster_20Part_202.mp4',
     });
@@ -59,12 +58,12 @@ function onAdd() {
 }
 
 async function onClick(index: number) {
-  multiVideoPlayer.swapVideo(0, index);
+  syncVideoPlayer.swapVideo(0, index);
 }
 
 async function onChange(e) {
   const value = e.target.value;
-  await multiVideoPlayer.timeTo(value);
+  await syncVideoPlayer.timeTo(value);
 }
 </script>
 
