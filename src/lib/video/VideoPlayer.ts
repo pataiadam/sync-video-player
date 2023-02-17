@@ -1,5 +1,6 @@
 import {PlayerState} from '../constants';
 import {MultiVideoPlayer, VideoPlayerOptions} from '../main';
+import {Logger} from "../utils";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = () => { };
@@ -14,6 +15,7 @@ class VideoPlayer {
   public videoState: PlayerState;
   private readonly _startSeconds: number;
   private readonly loop: boolean;
+  public isPlaying: boolean;
   constructor(player: MultiVideoPlayer, videoPlayerConfig: VideoPlayerOptions) {
     this.videoId = Math.random().toString(36).substring(2, 15);
     this.player = player;
@@ -27,6 +29,7 @@ class VideoPlayer {
     this.videoPlayerArea = null;
     this.videoElement = null;
     this.videoState = PlayerState.LOADING;
+    this.isPlaying = false;
 
     this.mount();
   }
@@ -36,30 +39,31 @@ class VideoPlayer {
     this.videoElement = document.querySelector(`#video_player_${this.videoId}`);
 
     if (!this.videoElement) {
-      return console.debug('video element not found');
+      return Logger.debug('video element not found');
     }
 
     this.setupVideoElement({ controls: this.controls, main: this.main });
 
-    this.videoElement.addEventListener('loadeddata', this.onReady.bind(this), false);
-    this.videoElement.addEventListener('canplaythrough', this.onStateChange.bind(this, PlayerState.UNSTARTED), false);
+
     this.videoElement.addEventListener('play', this.onStateChange.bind(this, PlayerState.PLAYING), false);
     this.videoElement.addEventListener('pause', this.onStateChange.bind(this, PlayerState.PAUSE), false);
     this.videoElement.addEventListener('seeking', this.onSeeking.bind(this), false);
     this.videoElement.addEventListener('timeupdate', this.onTimeUpdate.bind(this), false);
+    this.videoElement.addEventListener('loadeddata', this.onReady.bind(this), false);
+    this.videoElement.addEventListener('canplaythrough', this.onStateChange.bind(this, PlayerState.UNSTARTED), false);
 
     this.videoElement.addEventListener('ended', this.onStateChange.bind(this, PlayerState.ENDED), false);
     this.videoElement.addEventListener('waiting', this.onStateChange.bind(this, PlayerState.BUFFERING), false);
   }
 
   private onReady() {
-    console.log(this.videoId, '::[onReady]');
+    Logger.debug(this.videoId, '::[onReady]');
     this.timeTo(0);
     this.player.onReady();
   }
 
   private onSeeking() {
-    console.log(this.videoId, '::[onSeeking]');
+    Logger.debug(this.videoId, '::[onSeeking]');
     if (!this.main) {
       return;
     }
@@ -74,7 +78,7 @@ class VideoPlayer {
   }
 
   private onStateChange(state: PlayerState) {
-    console.log(this.videoId, '::[onStateChange]', state);
+    Logger.debug(this.videoId, '::[onStateChange]', state);
     this.videoState = state;
 
     const statesToPropagate = [
@@ -85,6 +89,20 @@ class VideoPlayer {
       PlayerState.UNSTARTED,
     ];
 
+    if (state === PlayerState.PLAYING) {
+      this.isPlaying = true;
+      if (!this.main) {
+        return;
+      }
+    }
+
+    if (state === PlayerState.PAUSE) {
+      this.isPlaying = false;
+      if (!this.main) {
+        return;
+      }
+    }
+
     if (statesToPropagate.includes(state)) {
       this.player.changeState(state, this);
     }
@@ -94,7 +112,7 @@ class VideoPlayer {
     // if video area is defined, add video to area
     this.videoPlayerArea = document.querySelector(this.videoPlayerConfig.id);
     if (!this.videoPlayerArea) {
-      return console.debug('id not found: ', this.videoPlayerConfig.id);
+      return Logger.debug('id not found: ', this.videoPlayerConfig.id);
     }
     this.videoPlayerArea.innerHTML = `
         <video 
@@ -138,11 +156,13 @@ class VideoPlayer {
 
   public async play() {
     if (!this.videoElement) return;
+    if (this.videoState === PlayerState.PLAYING) return;
     await this.videoElement.play().catch(noop);
   }
 
   public async pause() {
     if (!this.videoElement) return;
+    if (this.videoState === PlayerState.PAUSE) return;
     await this.videoElement.pause();
   }
 
@@ -162,22 +182,28 @@ class VideoPlayer {
     this.main = main;
   }
 
-  public timeTo(time: number, startPlay = false) {
+  public timeTo(time: number) {
     if (!this.videoElement) return;
     time = parseFloat(time.toString());
     time = (time + this._startSeconds);
 
     if (time >= this.getDuration()) {
-      // this.videoElement.currentTime = this.getDuration() - 0.5;
-      return console.debug('timeTo: time is greater than duration');
+      this.videoElement.currentTime = this.getDuration() -0.05;
+      Logger.debug('timeTo: time is greater than duration');
+      this.pause().then(noop);
+      return;
     }
 
-    console.log('set time to: ', time);
+    Logger.debug('set time to: ', time);
     this.videoElement.currentTime = time;
   }
 
   public getDuration() {
     return (this.videoElement?.duration || 0);
+  }
+
+  public getPlayLength() {
+    return this.getDuration() - this._startSeconds;
   }
 
   public getCurrentTime() {
@@ -187,6 +213,12 @@ class VideoPlayer {
   public getPlayedTime() {
     const time = this.getCurrentTime() - this._startSeconds;
     return Math.max(time, 0);
+  }
+
+  public isEnded() {
+    const diff = Math.abs(this.getCurrentTime() - this.getDuration());
+    return diff < 0.1;
+
   }
 }
 

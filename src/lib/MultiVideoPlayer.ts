@@ -1,5 +1,6 @@
 import {PlayerState} from './constants';
 import {MultiVideoPlayerOptions, VideoPlayerOptions} from './main';
+import {Logger} from "./utils";
 import VideoPlayer from './video/VideoPlayer';
 
 const validStates = {
@@ -61,7 +62,7 @@ class MultiVideoPlayer {
     }
     const areaEl = document.querySelector(area);
     if (!areaEl) {
-      return console.error('area not found: ', area);
+      return Logger.error('area not found: ', area);
     }
 
     areaEl.innerHTML = template || '';
@@ -77,8 +78,7 @@ class MultiVideoPlayer {
       return this.play();
     }
     if (state === PlayerState.PAUSE) {
-      const diff = Math.abs(videoPlayer.getCurrentTime() - videoPlayer.getDuration());
-      if (diff < 0.1) {
+      if (videoPlayer.isEnded()) {
         return;
       }
       return this.pause();
@@ -114,12 +114,12 @@ class MultiVideoPlayer {
       if (success) {
         await success(this.state, oldState);
       }
-      console.log('state changed to: ', state);
+      Logger.debug('state changed to: ', state);
     } else {
       if (fail) {
         await fail(this.state, state);
       }
-      console.error('invalid state change: ', this.state, state);
+      Logger.error('invalid state change: ', this.state, state);
     }
   }
 
@@ -135,6 +135,29 @@ class MultiVideoPlayer {
       this.timeTo(time);
     }
     this.currentTime = time;
+    this.fixVideoStates();
+  }
+
+  private fixVideoStates() {
+    const mainVideoPlayer = this.videoPlayers.find((vp) => {
+      return vp.main;
+    });
+
+    if (!mainVideoPlayer) return;
+    this.videoPlayers.forEach(vp => {
+      if (vp === mainVideoPlayer) return;
+      if (vp.isEnded()) return;
+      if(mainVideoPlayer.isPlaying && !vp.isPlaying) {
+        vp.play().catch(() => {
+          // noop
+        });
+      }
+      if(!mainVideoPlayer.isPlaying && vp.isPlaying) {
+        vp.pause().catch(() => {
+          // noop
+        });
+      }
+    });
   }
 
   /**
@@ -160,7 +183,9 @@ class MultiVideoPlayer {
     await this.moveStateTo(PlayerState.PLAYING, async () => {
       this.timeTo(this.currentTime);
       await Promise.all(this.videoPlayers.map(async video => {
-        await video.play();
+        if (this.currentTime < video.getPlayLength()) {
+          await video.play();
+        }
       }));
     });
   }
@@ -184,7 +209,7 @@ class MultiVideoPlayer {
   public timeTo(time: number) {
     this.currentTime = time;
     this.videoPlayers.forEach(video => {
-      video.timeTo(time, this.state === PlayerState.PLAYING);
+      video.timeTo(time);
     });
   }
 

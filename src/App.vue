@@ -59,14 +59,11 @@ function onAdd() {
 }
 
 async function onClick(index: number) {
-  console.log('onClick', index);
   multiVideoPlayer.swapVideo(0, index);
 }
 
 async function onChange(e) {
   const value = e.target.value;
-  console.log(value);
-  console.log('onChange', value);
   await multiVideoPlayer.timeTo(value);
 }
 </script>
