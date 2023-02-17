@@ -9,6 +9,7 @@ const ids = ref( ['video-0', 'video-1', 'video-2']);
 const multiVideoPlayer = new MultiVideoPlayer({
   //area: '#multi-video-player',
   controls: false,
+  loop: true,
   videoPlayers: [
     {
       id: '#video-0',
@@ -17,6 +18,7 @@ const multiVideoPlayer = new MultiVideoPlayer({
     },
     {
       id: '#video-1',
+      startSeconds: 10,
       initialSrc: 'https://static.videezy.com/system/resources/previews/000/051/313/original/002823-HD-SPECTRUM-COUNTDOWN-02.mp4',
     },
     {
@@ -59,6 +61,13 @@ async function onClick(index: number) {
   console.log('onClick', index);
   multiVideoPlayer.swapVideo(0, index);
 }
+
+async function onChange(e) {
+  const value = e.target.value;
+  console.log(value);
+  console.log('onChange', value);
+  await multiVideoPlayer.timeTo(value);
+}
 </script>
 
 <template>
@@ -75,6 +84,11 @@ async function onClick(index: number) {
       <button @click="onAdd" >Add video</button>
       <button @click="onPlay" >Play</button>
       <button @click="onPause">Pause</button>
+      <!-- range selector for time -->
+      <div class="time">
+        <input type="range" min="0" max="100" value="0" class="slider" id="myRange" @input="onChange">
+      </div>
+
     </div>
   </div>
 </template>
