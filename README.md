@@ -1,96 +1,100 @@
-# 🔁 SyncVideoPlayer
+# 🔄 SyncVideoPlayer
 
-SyncVideoPlayer is an npm package that allows you to easily play multiple HTML videos at the same time and have them stay in sync. It provides features such as looping and controls, and automatically keeps videos in sync. It works with all major browsers and is free and open source.
+SyncVideoPlayer is an npm package designed to synchronize multiple HTML videos effortlessly. It features looping, controls, and is compatible with all major browsers. Best of all, it's free and open source.
+
+![Example](demo.webp)
 
 ## ⭐️ Highlights
 
+- Zero dependencies 👜
 - Easy to use and set up 🚀
 - Can loop and control videos 🔁
 - Automatically keeps videos in sync 🤝
 - Compatible with all major browsers 🌐
-- Free and open source 🆓
 
-## 🚀 Installation
-
-To get started, install SyncVideoPlayer from npm:
-
-```
+## Installation
+Install SyncVideoPlayer via npm:
+```bash
 npm install sync-video-player
 ```
 
-## 🧑‍🚀 Usage
+## Quick Start
+Here's how to quickly set up SyncVideoPlayer:
 
-Once installed, you can use SyncVideoPlayer in your project like this:
+```html
+<html>
+<body>
+  <video id="video-0" width="300" height="200" controls></video>
+  <video id="video-1" width="300" height="200" controls></video>
+  <video id="video-2" width="300" height="200" controls></video>
+  
+  <script src="path/to/sync-video-player.js"></script>
+  <script>
+    const syncVideoPlayer = new SyncVideoPlayer({
+      controls: false,
+      loop: true,
+      videoPlayers: [
+        {
+          id: '#video-0',
+          controls: true,
+          main: true,
+          initialSrc: 'https://path/to/video1.mp4'
+        },
+        {
+          id: '#video-1',
+          startSeconds: 10,
+          initialSrc: 'https://path/to/video2.mp4'
+        },
+        {
+          id: '#video-2',
+          initialSrc: 'https://path/to/video3.mp4'
+        }
+      ]
+    });
 
-```jsx
-const syncVideoPlayer = new SyncVideoPlayer({
-  controls: false,
-  loop: true,
-  videoPlayers: [
-    {
-      id: '#video-0',
-      controls: true,
-      main: true,
-      initialSrc: '<https://static.videezy.com/system/resources/previews/000/050/817/original/002822-HD-SPECTRUM-COUNTDOWN-01.mp4>',
-    },
-    {
-      id: '#video-1',
-      startSeconds: 10,
-      initialSrc: '<https://static.videezy.com/system/resources/previews/000/051/313/original/002823-HD-SPECTRUM-COUNTDOWN-02.mp4>',
-    },
-    {
-      id: '#video-2',
-      initialSrc: '<https://static.videezy.com/system/resources/previews/000/049/943/original/002831-HD-COUNTDOWN-03.mp4>',
-    }
-  ],
-});
-
-//    Once you're ready, just mount it using 
-syncVideoPlayer.mount() 
-//    to start playing the videos.
+    syncVideoPlayer.mount();
+    
+    // Play all videos
+    syncVideoPlayer.play();
+    
+    // Pause all videos
+    syncVideoPlayer.pause();
+    
+    // Set playback time for all videos
+    syncVideoPlayer.timeTo(30);
+    
+    // Add a new video player
+    syncVideoPlayer.addVideoPlayer({
+      id: '#video-3',
+      initialSrc: 'https://path/to/video4.mp4'
+    });
+  </script>
+</body>
+</html>
 ```
 
-## 🧩 Parameters
+## API
 
-SyncVideoPlayer exposes the following parameters to customize the video player:
+### Constructor Options
+- `controls` (boolean): Show or hide video controls.
+- `loop` (boolean): Enable or disable looping.
+- `videoPlayers` (array): List of video configurations.
+    - `id`: HTMLElement ID for the video.
+    - `startSeconds`: Starting position in seconds.
+    - `initialSrc`: Initial video source URL.
+    - `main`: Specify which video is the main video (others sync to it).
+    - `controls`: Override global controls setting (default: true).
 
-| Name | Description |
-| --- | --- |
-| controls | Whether or not to show video controls |
-| loop | Whether or not to loop the video |
-| videoPlayers | An array of video players, each with an id, startSeconds, controls, main, and initialSrc |
+### Methods
+- `mount()`: Mounts the video players and starts playback.
+- `addVideoPlayers(videoPlayers)`: Add multiple video players.
+- `addVideoPlayer(videoPlayer)`: Add a single video player.
+- `timeTo(seconds)`: Set playback time for all video players.
+- `play()`: Start playback.
+- `pause():` Pause playback.
 
-Parameters for objects of `videoPlayers`:
+## Contributing
+We welcome contributions! Please read our [Contributing Guidelines](notion://www.notion.so/pataiadam/CONTRIBUTING.md) for more information.
 
-| Parameter | Description |
-| --- | --- |
-| videoPlayers.id | The id of the HTML element to render the video player |
-| videoPlayers.startSeconds | The starting position in the video (in seconds) |
-| videoPlayers.initialSrc | The initial source of the video |
-| videoPlayers.main |  specify which video should be the main video (all other videos will sync to it) |
-| videoPlayers.controls | Whether or not to show the video controls. Default true. This will override the global settings |
-
-## 🔧 Available Methods
-
-SyncVideoPlayer provides the following methods to control the player:
-
-- `mount()`: Mounts the video player and starts playing the videos.
-- `addVideoPlayers(videoPlayers)`: Adds multiple video players to the player.
-- `addVideoPlayer(videoPlayer)`: Adds a single video player to the player.
-- `timeTo(seconds)`: Sets the time of all players to the given seconds.
-- `play()`: Starts playing the videos.
-- `pause()`: Pauses the videos.
-
-## 🔥 Contributing
-
-We welcome contributions to the SyncVideoPlayer project! If you'd like to help out, please check out our [Contributing Guidelines](notion://www.notion.so/pataiadam/CONTRIBUTING.md) for more information.
-
-### 💖 Thanks
-
-We'd like to thank all of our contributors for their hard work and dedication to this project. Your help has made SyncVideoPlayer a success and we appreciate it!
-
-We'd also like to thank the [SplitPlayer](https://github.com/fluse/SplitPlayer) project for providing inspiration for this project.
-
-## 📄 License
-
-SyncVideoPlayer is released under the [MIT License](https://github.com/pataiadam/sync-video-player/blob/main/LICENSE).
+## License
+SyncVideoPlayer is open-source software licensed under the [MIT License](https://github.com/pataiadam/sync-video-player/blob/main/LICENSE).
