@@ -2,7 +2,7 @@
 
 SyncVideoPlayer is an npm package designed to synchronize multiple HTML videos effortlessly. It features looping, controls, and is compatible with all major browsers. Best of all, it's free and open source.
 
-![Example](demo.webp)
+![Example](https://raw.githubusercontent.com/pataiadam/sync-video-player/refs/heads/main/demo.webp)
 
 ## ⭐️ Highlights
 

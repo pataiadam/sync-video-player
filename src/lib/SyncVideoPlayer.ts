@@ -1,6 +1,6 @@
 import {PlayerState} from './constants';
 import {MultiVideoPlayerOptions, VideoPlayerOptions} from './main';
-import {Logger} from "./utils";
+import {Logger} from './utils';
 import VideoPlayer from './video/VideoPlayer';
 
 const validStates = {
@@ -177,6 +177,16 @@ class SyncVideoPlayer {
     const videoInstance = new VideoPlayer(this, videoPlayer);
     if (!videoInstance.videoElement) return;
     this.videoPlayers.push(videoInstance);
+
+    // FIXME: this is a hack to make sure the video is set to the correct time when added to the player
+    const timeTo = (i = 0) => {
+      if (i >= 50) return;
+      if (Math.abs(this.currentTime - videoInstance.getCurrentTime()) > 0.1) {
+        videoInstance.timeTo(this.currentTime);
+        setTimeout(() => timeTo(++i), 0);
+      }
+    };
+    timeTo();
   }
 
   public async play() {

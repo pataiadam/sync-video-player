@@ -14,20 +14,20 @@ const syncVideoPlayer = new SyncVideoPlayer({
       id: '#video-0',
       controls: true,
       main: true,
-      initialSrc: 'https://static.videezy.com/system/resources/previews/000/050/817/original/002822-HD-SPECTRUM-COUNTDOWN-01.mp4',
+      initialSrc: 'video1.mp4',
     },
     {
       id: '#video-1',
       startSeconds: 10,
-      initialSrc: 'https://static.videezy.com/system/resources/previews/000/051/313/original/002823-HD-SPECTRUM-COUNTDOWN-02.mp4',
+      initialSrc: 'video2.mp4',
     },
     {
       id: '#video-2',
-      initialSrc: 'https://static.videezy.com/system/resources/previews/000/049/943/original/002831-HD-COUNTDOWN-03.mp4',
+      initialSrc: 'video3.mp4',
     },
     {
       id: '#video-3',
-      initialSrc: 'https://static.videezy.com/system/resources/previews/000/004/294/original/18_20Dragon_20Coaster_20Part_202.mp4',
+      initialSrc: 'video4.mp4',
     },
   ],
 });
@@ -52,7 +52,7 @@ function onAdd() {
     // add video
     syncVideoPlayer.addVideoPlayer({
       id: `#${id}`,
-      initialSrc: 'https://static.videezy.com/system/resources/previews/000/004/294/original/18_20Dragon_20Coaster_20Part_202.mp4',
+      initialSrc: `video${Math.floor(Math.random() * 4) + 1}.mp4`,
     });
   });
 }
